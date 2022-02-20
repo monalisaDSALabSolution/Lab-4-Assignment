@@ -1,0 +1,34 @@
+-- 3. Display the number of teh customer group by their gender who have placed any order of amount greater than or equal to Rs. 3000.
+use 'order-directory' ;
+select customer.cus_gender,count(customer.cus_gender) as count from customer inner join 'order' on customer.cus_id where 'order' .ord_amount>=3000 group by customer.cus_gender;
+
+-- 4. Display all the order along with product name ordered by a customer having Customer_Id=2
+select 'order' .*,product.pro_name from 'order' ,product_details,product where 'order' .cus_id=2 and 'order' .prod_id=product_details.prod_id and product_details.prod_id=product.pro_id;
+
+-- 5. Display the Supplier details who can supply more than one product.
+select ssupplier.* from supplier,product_details where supplier.supp_id in (select product_details.supp_id from product_details group by product_details.supp_id having count(product_details.supp_id)>1) group by supplier.supp_id;
+
+select * from product_details;
+-- 6. Find the category of the product whose order amount is minimum
+
+select category.* from 'order' inner join product_details on 'order'.prod_id=product_details.prod_id inner join product on product.pro_id=product_details.pro_id inner join category on category.cat_id=product.cat_id having min('order' .ord_amount);
+
+select c.cat_id, c.cat_name, min(o..ord_amount) as amount
+from category c
+join product p on c.cat_id order by amount;
+
+--7. Display the Id and Name of the Product ordered after "2021-10-05".
+select product.pro_id,product.pro_name from 'order' inner join product on product.pro_id=product_details.pro_id where 'order'.ord_date>"2021-10-05";
+
+--8. Display customer name and gender whose name start or end with character 'A'.
+select customer.cus_name ,customer.cus_gender from customer where customer.cus_name like 'A___';
+
+--9. Create a stored procedureto displaythe Ratingfor a Supplier if any along with the Verdict on that rating if any like if rating >4 then "Genuine Supplier" if rating >2 "Average Supplier" else "Supplier should not be considered".
+select supplier.supp_id,supplier.supp_name,rating.rat_ratstars,
+
+CASE
+WHEN rating.rat_ratstars >4 THEN 'Genuine Supplier'
+WHEN rating.rat_ratstars >2 THEN 'Average Supplier'
+ELSE 'Supplier should nit be considered'
+
+END AS verdict from rating inner join supplier on supplier.supp_id=rating.supp_id;
